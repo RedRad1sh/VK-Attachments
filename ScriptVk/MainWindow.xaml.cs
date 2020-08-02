@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Net;
 using VkNet.AudioBypassService.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 
 namespace ScriptVk
 {
@@ -35,6 +36,7 @@ namespace ScriptVk
         private string ext = ".jpg";
         public string token;
         List<string> list;
+        public VkConversation Conversation;
         public MainWindow()
         {
             InitializeComponent();
@@ -42,20 +44,30 @@ namespace ScriptVk
         }
         public void Autorization(string token)
         {
-            var service = new ServiceCollection();
-            service.AddAudioBypass();
-            api = new VkApi(service);
-            ulong appID = 2685278;
-            Settings settings = Settings.All;
-            api.Authorize(new ApiAuthParams
+            try
             {
-                AccessToken = token,
-                ApplicationId = appID,
-                Login = LoginEnter.Text,
-                Password = PassEnter.Password,
-                Settings = settings
-            });
-            Console.WriteLine(api.Token);
+                var service = new ServiceCollection();
+                service.AddAudioBypass();
+                api = new VkApi(service);
+                ulong appID = 2685278;
+                Settings settings = Settings.All;
+                api.Authorize(new ApiAuthParams
+                {
+                    AccessToken = token,
+                    ApplicationId = appID,
+                    Settings = settings
+                });
+                Console.WriteLine(api.Token);
+                SecondStep.IsEnabled = true;
+                ConvName.IsEnabled = false;
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Ошибка авторизации: " + error);
+                SecondStep.IsEnabled = false;
+                ThirdStep.IsEnabled = false;
+                FourthStep.IsEnabled = false;
+            }
         }
 
         private void PhotoShow()
@@ -65,7 +77,7 @@ namespace ScriptVk
             var getHistoryAttachments = api.Messages.GetHistoryAttachments(new MessagesGetHistoryAttachmentsParams
             {
                 MediaType = VkNet.Enums.SafetyEnums.MediaType.Photo,
-                PeerId = Convert.ToInt64(ConvID.Text),
+                PeerId = Convert.ToInt64(Conversation.ID),
                 Count = Convert.ToInt32(NumberOfAttach.Text)
             }, out str);
             list = new List<string>();
@@ -73,7 +85,7 @@ namespace ScriptVk
             {
                 var photos = photo.Attachment.Instance as VkNet.Model.Attachments.Photo;
                 var URL = photos.Sizes[photos.Sizes.Count - 1].Url.AbsoluteUri;
-                Images.Items.Add(URL);
+                Images.Items.Add(URL.Split('/').LastOrDefault());
                 list.Add(URL);
             }
         }
@@ -85,7 +97,7 @@ namespace ScriptVk
             var getHistoryAttachments = api.Messages.GetHistoryAttachments(new MessagesGetHistoryAttachmentsParams
             {
                 MediaType = VkNet.Enums.SafetyEnums.MediaType.Video,
-                PeerId = Convert.ToInt64(ConvID.Text),
+                PeerId = Convert.ToInt64(Conversation.ID),
                 Count = Convert.ToInt32(NumberOfAttach.Text)
             }, out str);
             List<VkNet.Model.Attachments.Video> vidlist = new List<VkNet.Model.Attachments.Video>();
@@ -118,7 +130,7 @@ namespace ScriptVk
             var getHistoryAttachments = api.Messages.GetHistoryAttachments(new MessagesGetHistoryAttachmentsParams
             {
                 MediaType = VkNet.Enums.SafetyEnums.MediaType.Audio,
-                PeerId = Convert.ToInt64(ConvID.Text),
+                PeerId = Convert.ToInt64(Conversation.ID),
                 Count = Convert.ToInt32(NumberOfAttach.Text)
             }, out str);
 
@@ -126,27 +138,34 @@ namespace ScriptVk
             foreach (var audio in getHistoryAttachments)
             {
                 var aud = audio.Attachment.Instance as VkNet.Model.Attachments.Audio;
-                list.Add(aud.Url.AbsoluteUri);
+                string url = aud.Url.AbsoluteUri.Contains(".mp3") ? aud.Url.AbsoluteUri : M3U8ToMp3(aud.Url.AbsoluteUri);
+                list.Add(url);
                 Images.Items.Add(aud.Title);
             }
 
+        }
+
+        private string M3U8ToMp3 (string url)
+        {
+            int ind = url.IndexOf("/index.m3u8");
+            url = url.Replace("/index.m3u8", ".mp3");
+            int firstindex = url.LastIndexOf('/', ind);
+            int secondindex = url.LastIndexOf('/', firstindex - 1);
+            url = url.Remove(firstindex, firstindex - secondindex);
+            return url;
         }
 
         private void Images_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ext == ".jpg")
             {
-                img.Source = new BitmapImage(new Uri(Images.SelectedItem.ToString()));
+                img.Source = new BitmapImage(new Uri(list[Images.SelectedIndex]));
             }
         }
 
         private void Autorization_Click(object sender, RoutedEventArgs e)
         {
-            AuthorizationForm GettingToken = new AuthorizationForm
-            {
-                login = LoginEnter.Text,
-                pass = PassEnter.Password
-            };
+            AuthorizationForm GettingToken = new AuthorizationForm();
             GettingToken.ShowDialog();
             Autorization(token);
         }
@@ -159,13 +178,17 @@ namespace ScriptVk
         private void DownloadAttachments(System.Collections.IList collection)
         {
             int i = 0;
+            if(!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\" + Conversation.Title))
+            {
+                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "\\" + Conversation.Title);
+            }
             foreach (var item in collection)
             {
                 try
                 {
                     using (WebClient client = new WebClient())
                     {
-                        client.DownloadFile(list[collection.IndexOf(item)], AppDomain.CurrentDomain.BaseDirectory + "\\" + ConvID.Text + "\\" + item.ToString() + ext);
+                        client.DownloadFile(list[Images.Items.IndexOf(item)], AppDomain.CurrentDomain.BaseDirectory + "\\" + Conversation.Title + "\\" + item.ToString() + ext);
                     }
                 } catch
                 {
@@ -208,10 +231,12 @@ namespace ScriptVk
             try
             {
                 ChoiseAttach();
+                FourthStep.IsEnabled = true;
             }
             catch (Exception error)
             {
                 MessageBox.Show("Ошибка открытия диалога. Причина: " + error.Message);
+                FourthStep.IsEnabled = false;
             }
     
         }
@@ -219,6 +244,27 @@ namespace ScriptVk
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             
+        }
+
+        private void NumberOfAttach_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var window = new SelectConversationWindow(api, int.Parse(Count.Text));
+                window.ShowDialog();
+                ConvName.Text = Conversation.Title;
+                ThirdStep.IsEnabled = true;
+                ShowAttachments.IsEnabled = true;
+            }
+            catch
+            {
+                MessageBox.Show("Введите количество выводимых бесед");
+            }
         }
     }
 

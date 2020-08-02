@@ -7,12 +7,12 @@
         mc:Ignorable="d"
         Title="VKAttachments" Height="628.5" Width="890" Background="#F2D6CCE2" ResizeMode="NoResize">
     <Grid>
-        <Border BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="571" Margin="23,18,0,0" VerticalAlignment="Top" Width="250">
+        <Border x:Name="FourthStep" BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="571" Margin="23,18,0,0" VerticalAlignment="Top" Width="250" IsEnabled="False">
             <Grid>
                 <ListBox x:Name="Images" HorizontalAlignment="Left" Height="485" Margin="10,72,0,0" VerticalAlignment="Top" Width="226" SelectionChanged="Images_SelectionChanged" SelectionMode="Extended" Background="#C8EFE2FF" Foreground="#FF221578"/>
-                <Button x:Name="DownloadAll" Content="Скачать все" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Click="DownloadAll_Click" Height="31" Margin="14,30,0,0" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14"/>
-                <Button x:Name="DownloadCurrent" Content="Скачать выбранные" HorizontalAlignment="Left" Margin="99,30,0,0" VerticalAlignment="Top" Width="137" Height="31" Click="DownloadCurrent_Click" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14"/>
-                <TextBlock HorizontalAlignment="Left" Margin="11,3,0,0" TextWrapping="Wrap" Text="#3" VerticalAlignment="Top" FontFamily="Segoe Script" FontSize="18" RenderTransformOrigin="0.559,1.145" Foreground="#FF221578">
+                <Button x:Name="DownloadAll" Content="Скачать все" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Click="DownloadAll_Click" Height="31" Margin="14,30,0,0" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="10" Padding="0"/>
+                <Button x:Name="DownloadCurrent" Content="Скачать выбранные" HorizontalAlignment="Left" Margin="99,30,0,0" VerticalAlignment="Top" Width="137" Height="31" Click="DownloadCurrent_Click" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="10" Padding="0"/>
+                <TextBlock HorizontalAlignment="Left" Margin="11,0,0,535" TextWrapping="Wrap" Text="#4" VerticalAlignment="Bottom" FontFamily="Segoe Script" FontSize="18" RenderTransformOrigin="0.559,1.145" Foreground="#FF221578">
                     <TextBlock.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -25,11 +25,9 @@
             </Grid>
         </Border>
 
-        <Border BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="187" Margin="295,18,0,0" VerticalAlignment="Top" Width="563">
+        <Border x:Name="FirstStep" BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="61" Margin="295,18,0,0" VerticalAlignment="Top" Width="563">
             <Grid>
-                <Button x:Name="Autorization_BUT" Content="Авторизация" HorizontalAlignment="Left" Margin="268,139,0,0" VerticalAlignment="Top" Width="242" Click="Autorization_Click" Height="34" FontSize="24" FontFamily="Verdana" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070"/>
-                <PasswordBox x:Name="PassEnter" HorizontalAlignment="Left" Height="34" Margin="268,79,0,0" VerticalAlignment="Top" Width="242" VerticalContentAlignment="Center" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14"/>
-                <TextBox x:Name="LoginEnter" HorizontalAlignment="Left" Height="34" Margin="268,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="242" UndoLimit="1000" VerticalContentAlignment="Center" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14"/>
+                <Button x:Name="Autorization_BUT" Content="Авторизация" HorizontalAlignment="Left" Margin="151,10,0,0" VerticalAlignment="Top" Width="242" Click="Autorization_Click" Height="34" FontSize="22" FontFamily="Verdana" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" Padding="0"/>
                 <TextBlock HorizontalAlignment="Left" Margin="8,6,0,0" TextWrapping="Wrap" Text="#1" VerticalAlignment="Top" FontFamily="Segoe Script" FontSize="18" RenderTransformOrigin="1.172,0.148" Foreground="#FF221578">
                     <TextBlock.RenderTransform>
                         <TransformGroup>
@@ -40,32 +38,56 @@
                         </TransformGroup>
                     </TextBlock.RenderTransform>
                 </TextBlock>
-                <TextBlock HorizontalAlignment="Left" Margin="38,30,0,0" TextWrapping="Wrap" Text="Введите логин:" VerticalAlignment="Top" Foreground="#FF221578" FontSize="20"/>
-                <TextBlock HorizontalAlignment="Left" Margin="38,84,0,0" TextWrapping="Wrap" Text="Введите пароль:" VerticalAlignment="Top" Foreground="#FF221578" FontSize="20"/>
-                <TextBlock x:Name="DoneAuth" HorizontalAlignment="Left" Margin="66,146,0,0" TextWrapping="Wrap" Text="Успешно!" VerticalAlignment="Top" Foreground="#FF14A857" FontSize="20" Visibility="Hidden"/>
+                <TextBlock x:Name="DoneAuth" HorizontalAlignment="Left" Margin="415,14,0,0" TextWrapping="Wrap" Text="Успешно!" VerticalAlignment="Top" Foreground="#FF14A857" FontSize="20" Visibility="Hidden"/>
             </Grid>
         </Border>
-        <Image x:Name="img" HorizontalAlignment="Left" Height="250" Margin="295,339,0,0" VerticalAlignment="Top" Width="563"/>
-        <Border BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="124" Margin="295,210,0,0" VerticalAlignment="Top" Width="563">
+        <Image x:Name="img" HorizontalAlignment="Left" Height="350" Margin="295,239,0,0" VerticalAlignment="Top" Width="563"/>
+        <Border x:Name="SecondStep" BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="73" Margin="295,84,0,0" VerticalAlignment="Top" Width="563" IsEnabled="False">
             <Grid>
-                <TextBlock HorizontalAlignment="Left" Margin="10,27,0,0" TextWrapping="Wrap" Text="Введите ID беседы" VerticalAlignment="Top" Foreground="#FF221578" FontSize="16"/>
-                <TextBox x:Name="ConvID" HorizontalAlignment="Left" Height="31" Margin="209,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="341" UndoLimit="1000" VerticalContentAlignment="Center" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14"/>
-                <Button x:Name="ShowAttachments" Content="Вывести вложения" HorizontalAlignment="Left" Margin="388,61,0,0" VerticalAlignment="Top" Width="162" Height="29" Click="ShowAttachments_Click" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="16"/>
-                <TextBox x:Name="NumberOfAttach" HorizontalAlignment="Left" Height="29" Margin="209,61,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" Width="51" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="16"/>
-                <TextBlock HorizontalAlignment="Left" Margin="10,61,0,0" TextWrapping="Wrap" Text="Количество вложений (0 - все)" VerticalAlignment="Top" Height="49" Width="194" LineHeight="14" Foreground="#FF221578" FontSize="16"/>
-                <ComboBox x:Name="Extension" HorizontalAlignment="Left" Margin="265,62,0,0" VerticalAlignment="Top" Width="118" Height="29" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="16">
-                    <ComboBoxItem Content="Фотографии"/>
-                    <ComboBoxItem Content="Видеозаписи"/>
-                    <ComboBoxItem IsEnabled="True" Content="Аудиозаписи"/>
-                    <ComboBoxItem IsEnabled="False" Content="Документы (скоро)"/>
-                    <ComboBoxItem IsEnabled="False" Content="Ссылки (скоро)"/>
-                </ComboBox>
+                <TextBlock HorizontalAlignment="Left" Margin="294,24,0,0" TextWrapping="Wrap" Text="Имя беседы" VerticalAlignment="Top" Foreground="#FF221578" FontSize="16"/>
+                <TextBox x:Name="ConvName" HorizontalAlignment="Left" Height="31" Margin="388,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="162" UndoLimit="1000" VerticalContentAlignment="Center" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14"/>
                 <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" Text="#2" VerticalAlignment="Top" FontFamily="Segoe Script" FontSize="18" RenderTransformOrigin="0.5,0.5" Foreground="#FF221578">
                     <TextBlock.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
                             <SkewTransform/>
                             <RotateTransform Angle="24.279"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <Button Content="Выбрать беседу" HorizontalAlignment="Left" Margin="111,20,0,0" VerticalAlignment="Top" Width="178" Height="31" Foreground="#FF221578" BorderBrush="#00707070" Click="Button_Click" Padding="0" FontSize="16"/>
+                <TextBox x:Name="Count" HorizontalAlignment="Left" Height="31" Margin="40,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" UndoLimit="1000" VerticalContentAlignment="Center" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14"/>
+                <Label Content="Число бесед" HorizontalAlignment="Left" Margin="38,46,0,0" VerticalAlignment="Top" FontSize="10" Width="69"/>
+            </Grid>
+        </Border>
+        <Border x:Name="ThirdStep" BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="72" Margin="295,162,0,0" VerticalAlignment="Top" Width="563" IsEnabled="False">
+            <Grid>
+                <Button x:Name="ShowAttachments" Content="Вывести вложения" HorizontalAlignment="Left" Margin="387,19,0,0" VerticalAlignment="Top" Width="162" Height="30" Click="ShowAttachments_Click" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14" IsEnabled="False" Padding="0"/>
+                <TextBox x:Name="NumberOfAttach" HorizontalAlignment="Left" Height="30" Margin="208,19,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" Width="51" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="16" TextChanged="NumberOfAttach_TextChanged"/>
+                <TextBlock HorizontalAlignment="Left" Margin="58,7,0,0" TextWrapping="Wrap" Text="Количество вложений (0 - все)" VerticalAlignment="Top" Height="48" Width="145" LineHeight="14" Foreground="#FF221578" FontSize="16" RenderTransformOrigin="0.5,0.5">
+                    <TextBlock.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform Angle="0.371"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <ComboBox x:Name="Extension" HorizontalAlignment="Left" Margin="264,19,0,0" VerticalAlignment="Top" Width="118" Height="30" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14">
+                    <ComboBoxItem Content="Фотографии"/>
+                    <ComboBoxItem Content="Видеозаписи"/>
+                    <ComboBoxItem IsEnabled="True" Content="Аудиозаписи"/>
+                    <ComboBoxItem IsEnabled="False" Content="Документы (скоро)"/>
+                    <ComboBoxItem IsEnabled="False" Content="Ссылки (скоро)"/>
+                </ComboBox>
+                <TextBlock HorizontalAlignment="Left" Margin="11,10,0,0" TextWrapping="Wrap" Text="#3" VerticalAlignment="Top" FontFamily="Segoe Script" FontSize="18" RenderTransformOrigin="0.5,0.5" Foreground="#FF221578">
+                    <TextBlock.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform Angle="-14.112"/>
                             <TranslateTransform/>
                         </TransformGroup>
                     </TextBlock.RenderTransform>

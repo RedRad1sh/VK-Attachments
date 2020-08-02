@@ -145,5 +145,15 @@ C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\protobuf-net.dll
 C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\protobuf-net.xml
 C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\obj\Debug\AuthorizationForm.g.cs
 C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\obj\Debug\AuthorizationForm.baml
-C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\obj\Debug\ScriptVk.csproj.ResolveComReference.cache
 C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\VkNet.AudioBypassService.dll
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\obj\Debug\SelectConversationWindow.g.cs
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\ControlzEx.dll
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\MahApps.Metro.dll
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\Microsoft.Xaml.Behaviors.dll
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\ControlzEx.pdb
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\ControlzEx.xml
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\MahApps.Metro.pdb
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\MahApps.Metro.xml
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\Microsoft.Xaml.Behaviors.pdb
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\bin\Debug\Microsoft.Xaml.Behaviors.xml
+C:\Users\zmeun\source\repos\ScriptVk\ScriptVk\obj\Debug\SelectConversationWindow.baml
