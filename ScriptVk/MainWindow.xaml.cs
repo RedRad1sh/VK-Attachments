@@ -21,6 +21,7 @@ using System.Net;
 using VkNet.AudioBypassService.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace ScriptVk
 {
@@ -35,13 +36,15 @@ namespace ScriptVk
         private VkApi api;
         private string ext = ".jpg";
         public string token;
-        List<string> list;
+        private string imgNotAvailable = AppDomain.CurrentDomain.BaseDirectory + "\\" + "No_Image_Available.jpg";
+
         public VkConversation Conversation;
         public MainWindow()
         {
             InitializeComponent();
             Instance = this;
         }
+
         public void Autorization(string token)
         {
             try
@@ -72,34 +75,44 @@ namespace ScriptVk
 
         private void PhotoShow()
         {
-            string str;
-            Images.Items.Clear();
-            var getHistoryAttachments = api.Messages.GetHistoryAttachments(new MessagesGetHistoryAttachmentsParams
-            {
-                MediaType = VkNet.Enums.SafetyEnums.MediaType.Photo,
-                PeerId = Convert.ToInt64(Conversation.ID),
-                Count = Convert.ToInt32(NumberOfAttach.Text)
-            }, out str);
-            list = new List<string>();
+            AttachmentsList.Items.Clear();
+
+            var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Photo);
+
             foreach (var photo in getHistoryAttachments)
             {
                 var photos = photo.Attachment.Instance as VkNet.Model.Attachments.Photo;
-                var URL = photos.Sizes[photos.Sizes.Count - 1].Url.AbsoluteUri;
-                Images.Items.Add(URL.Split('/').LastOrDefault());
-                list.Add(URL);
+                var url = photos.Sizes[photos.Sizes.Count - 1].Url.AbsoluteUri;
+                var attachment = new VkAttachment.VkPhoto(url.Split('/').LastOrDefault(), url);
+                AttachmentsList.Items.Add(attachment);
+            }
+        }
+
+        private void DocumentShow()
+        {
+            AttachmentsList.Items.Clear();
+            var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Doc);
+
+
+            foreach (var doc in getHistoryAttachments)
+            {
+                VkNet.Model.Attachments.Document document;
+                if ((document = doc.Attachment.Instance as VkNet.Model.Attachments.Document) != null)
+                {
+                    var preview = imgNotAvailable;
+                    try { preview = document.Preview.Photo.Url.AbsoluteUri; } catch { }
+                    var attachment = new VkAttachment.VkDocument(document.Title, document.Uri,"." + document.Ext, preview );
+                    AttachmentsList.Items.Add(attachment);
+                }
             }
         }
 
         private void VideoShow()
         {
-            string str;
-            Images.Items.Clear();
-            var getHistoryAttachments = api.Messages.GetHistoryAttachments(new MessagesGetHistoryAttachmentsParams
-            {
-                MediaType = VkNet.Enums.SafetyEnums.MediaType.Video,
-                PeerId = Convert.ToInt64(Conversation.ID),
-                Count = Convert.ToInt32(NumberOfAttach.Text)
-            }, out str);
+            AttachmentsList.Items.Clear();
+
+            var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Video);
+
             List<VkNet.Model.Attachments.Video> vidlist = new List<VkNet.Model.Attachments.Video>();
             foreach (var video in getHistoryAttachments)
             {
@@ -110,56 +123,59 @@ namespace ScriptVk
             {
                 Videos = vidlist
             });
-            list = new List<string>();
             foreach (var item in videos)
             {
-                if (item.Files.Mp4_240 != null)
-                {
-                    Images.Items.Add(item.Title);
-                    list.Add(item.Files.Mp4_240.ToString());
-                }
+                var attachment = new VkAttachment.VkVideo(item.Title, item.Files, item.Image.LastOrDefault().Url.AbsoluteUri ?? imgNotAvailable, item.Files.Mp4_240 != null ? item.Files.Mp4_240.AbsoluteUri : imgNotAvailable);
+                AttachmentsList.Items.Add(attachment);
             }
         }
 
         private void AudioShow()
         {
-            Images.Items.Clear();
+            AttachmentsList.Items.Clear();
 
-            string str;
+            var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Audio);
 
-            var getHistoryAttachments = api.Messages.GetHistoryAttachments(new MessagesGetHistoryAttachmentsParams
-            {
-                MediaType = VkNet.Enums.SafetyEnums.MediaType.Audio,
-                PeerId = Convert.ToInt64(Conversation.ID),
-                Count = Convert.ToInt32(NumberOfAttach.Text)
-            }, out str);
-
-            list = new List<string>();
             foreach (var audio in getHistoryAttachments)
             {
                 var aud = audio.Attachment.Instance as VkNet.Model.Attachments.Audio;
                 string url = aud.Url.AbsoluteUri.Contains(".mp3") ? aud.Url.AbsoluteUri : M3U8ToMp3(aud.Url.AbsoluteUri);
-                list.Add(url);
-                Images.Items.Add(aud.Title);
+                
+                var preview = new AudioCover() { Photo300 = imgNotAvailable };
+                
+                try { preview = aud.Album.Thumb; } catch { }
+                var attachment = new VkAttachment.VkAudio(aud.Title, url, preview);
+                AttachmentsList.Items.Add(attachment);
             }
 
         }
 
-        private string M3U8ToMp3 (string url)
+        private ReadOnlyCollection<HistoryAttachment> GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType type)
+        {
+            return api.Messages.GetHistoryAttachments(new MessagesGetHistoryAttachmentsParams
+            {
+                MediaType = type,
+                PeerId = Convert.ToInt64(Conversation.ID),
+                Count = Convert.ToInt32(NumberOfAttach.Text)
+            }, out string str);
+        }
+
+        private string M3U8ToMp3(string url)
         {
             int ind = url.IndexOf("/index.m3u8");
             url = url.Replace("/index.m3u8", ".mp3");
             int firstindex = url.LastIndexOf('/', ind);
             int secondindex = url.LastIndexOf('/', firstindex - 1);
-            url = url.Remove(firstindex, firstindex - secondindex);
+            url = url.Remove(secondindex, firstindex - secondindex);
             return url;
         }
 
-        private void Images_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AttachmentsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ext == ".jpg")
+            if (AttachmentsList.SelectedIndex != -1)
             {
-                img.Source = new BitmapImage(new Uri(list[Images.SelectedIndex]));
+                var attachment = AttachmentsList.SelectedItem as VkAttachment;
+                img.Source = new BitmapImage(new Uri(attachment.PreviewUrl ?? imgNotAvailable));
             }
         }
 
@@ -172,13 +188,13 @@ namespace ScriptVk
 
         private void DownloadAll_Click(object sender, RoutedEventArgs e)
         {
-            DownloadAttachments(Images.Items);
+            DownloadAttachments(AttachmentsList.Items);
         }
 
         private void DownloadAttachments(System.Collections.IList collection)
         {
             int i = 0;
-            if(!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\" + Conversation.Title))
+            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\" + Conversation.Title))
             {
                 Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "\\" + Conversation.Title);
             }
@@ -188,11 +204,13 @@ namespace ScriptVk
                 {
                     using (WebClient client = new WebClient())
                     {
-                        client.DownloadFile(list[Images.Items.IndexOf(item)], AppDomain.CurrentDomain.BaseDirectory + "\\" + Conversation.Title + "\\" + item.ToString() + ext);
+                        var attachment = (item as VkAttachment);
+                        client.DownloadFile(attachment.Url, AppDomain.CurrentDomain.BaseDirectory + "\\" + Conversation.Title + "\\" + attachment.NameOfDownloadedFile);
                     }
-                } catch
+                }
+                catch (Exception error)
                 {
-                    MessageBox.Show("Неизвестная ошибка при загрузке вложения", "Ошибка");
+                    MessageBox.Show("Ошибка при загрузке вложения: " + error);
                 }
                 i++;
             }
@@ -200,28 +218,24 @@ namespace ScriptVk
 
         private void DownloadCurrent_Click(object sender, RoutedEventArgs e)
         {
-            DownloadAttachments(Images.SelectedItems);
+            DownloadAttachments(AttachmentsList.SelectedItems);
         }
 
         private void ChoiseAttach()
         {
-            switch (Extension.SelectedIndex)
+            switch (AttachmentType.SelectedIndex)
             {
                 case 0:
-                    ext = ".jpg";
                     PhotoShow();
                     break;
                 case 1:
-                    ext = ".mp4";
                     VideoShow();
                     break;
                 case 2:
-                    ext = ".mp3";
                     AudioShow();
                     break;
-                default:
-                    ext = ".jpg";
-                    PhotoShow();
+                case 3:
+                    DocumentShow();
                     break;
             }
         }
@@ -235,15 +249,15 @@ namespace ScriptVk
             }
             catch (Exception error)
             {
-                MessageBox.Show("Ошибка открытия диалога. Причина: " + error.Message);
+                MessageBox.Show("Ошибка открытия диалога: " + error);
                 FourthStep.IsEnabled = false;
             }
-    
+
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+
         }
 
         private void NumberOfAttach_TextChanged(object sender, TextChangedEventArgs e)
@@ -266,6 +280,6 @@ namespace ScriptVk
                 MessageBox.Show("Введите количество выводимых бесед");
             }
         }
-    }
 
+    }
 }
