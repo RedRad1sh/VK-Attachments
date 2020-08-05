@@ -54,10 +54,10 @@ namespace ScriptVk
             {
                 if (numbrefr > 5)
                 {
-                    MessageBox.Show("Возникла ошибка при авторизации: " + error);
                     MainWindow.Instance.DoneAuth.Visibility = Visibility.Visible;
                     MainWindow.Instance.DoneAuth.Foreground = Brushes.DarkRed;
-                    MainWindow.Instance.DoneAuth.Text = "Ошмбка";
+                    MainWindow.Instance.DoneAuth.Text = "Ошибка";
+                    MessageBox.Show("Возникла ошибка при авторизации: " + error);
                     Close();
                 }
                 else

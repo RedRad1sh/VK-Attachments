@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VkNet.Model;
 
+
 namespace ScriptVk
 {
     public class VkAttachment
@@ -21,7 +22,7 @@ namespace ScriptVk
         {
             foreach (var item in IllegalSymbols)
             {
-                NameOfDownloadedFile = NameOfDownloadedFile.Replace(item, '\0');
+                NameOfDownloadedFile = NameOfDownloadedFile.Replace(item.ToString(), "");
             }
         }
         
@@ -50,7 +51,7 @@ namespace ScriptVk
             {
                 VideoUrls = videoFiles;
                 PreviewUrl = previewUrl;
-                SelectResolution();
+                UpdateResolutionLinks();
                 ClearNameFromIllegalSymbols();
             }
 
@@ -60,32 +61,25 @@ namespace ScriptVk
                 Mp4_360,
                 Mp4_480,
                 Mp4_720,
-                Mp4_1080
+                Mp4_108
             }
 
-            public void SelectResolution(Resolution res = Resolution.Mp4_240)
+            public Uri[] VideoQualityUrls = new Uri[5];
+
+            public void UpdateResolutionLinks()
             {
-                try
-                {
-                    switch (res)
+                try {
+                    VideoQualityUrls[0] = VideoUrls.Mp4_240;
+                    VideoQualityUrls[1] = VideoUrls.Mp4_360;
+                    VideoQualityUrls[2] = VideoUrls.Mp4_480;
+                    VideoQualityUrls[3] = VideoUrls.Mp4_720;
+                    VideoQualityUrls[4] = VideoUrls.Mp4_1080;
+
+                    foreach (var item in VideoQualityUrls)
                     {
-                        case Resolution.Mp4_240:
-                            Url = VideoUrls.Mp4_240.ToString();
-                            break;
-                        case Resolution.Mp4_360:
-                            Url = VideoUrls.Mp4_360.ToString();
-                            break;
-                        case Resolution.Mp4_480:
-                            Url = VideoUrls.Mp4_480.ToString();
-                            break;
-                        case Resolution.Mp4_720:
-                            Url = VideoUrls.Mp4_720.ToString();
-                            break;
-                        case Resolution.Mp4_1080:
-                            Url = VideoUrls.Mp4_1080.ToString();
-                            break;
+                        Url = item != null ? Url = item.ToString() : Url; 
                     }
-                } catch { Url = "empty"; }
+                } catch { Url = null; }
             }
         }
         public class VkAudio : VkAttachment
@@ -93,6 +87,13 @@ namespace ScriptVk
             public VkAudio(string title, string url, AudioCover thumb, string extension = ".mp3") : base(title, url, extension)
             {
                 PreviewUrl = thumb.Photo300;
+                ClearNameFromIllegalSymbols();
+            }
+        }
+        public class VkLink: VkAttachment
+        {
+            public VkLink(string title, string url, string extension = ".txt") : base(title, url, extension)
+            {
                 ClearNameFromIllegalSymbols();
             }
         }

@@ -65,7 +65,7 @@
         <Border x:Name="ThirdStep" BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="72" Margin="295,162,0,0" VerticalAlignment="Top" Width="563" IsEnabled="False">
             <Grid>
                 <Button x:Name="ShowAttachments" Content="Вывести вложения" HorizontalAlignment="Left" Margin="387,19,0,0" VerticalAlignment="Top" Width="162" Height="30" Click="ShowAttachments_Click" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14" IsEnabled="False" Padding="0"/>
-                <TextBox x:Name="NumberOfAttach" HorizontalAlignment="Left" Height="30" Margin="208,19,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" Width="51" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="16" TextChanged="NumberOfAttach_TextChanged"/>
+                <TextBox x:Name="NumberOfAttach" HorizontalAlignment="Left" Height="30" Margin="208,19,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" Width="51" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="16"/>
                 <TextBlock HorizontalAlignment="Left" Margin="58,7,0,0" TextWrapping="Wrap" Text="Количество вложений (0 - все)" VerticalAlignment="Top" Height="48" Width="145" LineHeight="14" Foreground="#FF221578" FontSize="16" RenderTransformOrigin="0.5,0.5">
                     <TextBlock.RenderTransform>
                         <TransformGroup>
@@ -76,12 +76,12 @@
                         </TransformGroup>
                     </TextBlock.RenderTransform>
                 </TextBlock>
-                <ComboBox x:Name="AttachmentType" HorizontalAlignment="Left" Margin="264,19,0,0" VerticalAlignment="Top" Width="118" Height="30" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14">
+                <ComboBox x:Name="AttachmentType" HorizontalAlignment="Left" Margin="264,19,0,0" VerticalAlignment="Top" Width="118" Height="30" SelectedIndex="0" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="14">
                     <ComboBoxItem Content="Фотографии"/>
                     <ComboBoxItem Content="Видеозаписи"/>
-                    <ComboBoxItem IsEnabled="True" Content="Аудиозаписи"/>
-                    <ComboBoxItem IsEnabled="True" Content="Документы"/>
-                    <ComboBoxItem IsEnabled="False" Content="Ссылки (скоро)"/>
+                    <ComboBoxItem Content="Аудиозаписи"/>
+                    <ComboBoxItem Content="Документы"/>
+                    <ComboBoxItem Content="Ссылки"/>
                 </ComboBox>
                 <TextBlock HorizontalAlignment="Left" Margin="11,10,0,0" TextWrapping="Wrap" Text="#3" VerticalAlignment="Top" FontFamily="Segoe Script" FontSize="18" RenderTransformOrigin="0.5,0.5" Foreground="#FF221578">
                     <TextBlock.RenderTransform>
