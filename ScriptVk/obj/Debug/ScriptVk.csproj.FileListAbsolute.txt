@@ -318,3 +318,4 @@ C:\Users\zmeun\Documents\GitHub\VK-Attachments\ScriptVk\obj\Debug\ScriptVk.Prope
 C:\Users\zmeun\Documents\GitHub\VK-Attachments\ScriptVk\obj\Debug\ScriptVk.csproj.GenerateResource.cache
 C:\Users\zmeun\Documents\GitHub\VK-Attachments\ScriptVk\obj\Debug\ScriptVk.csproj.CopyComplete
 C:\Users\zmeun\Documents\GitHub\VK-Attachments\ScriptVk\bin\Debug\No_Image_Available.jpg
+C:\Users\zmeun\Documents\GitHub\VK-Attachments\ScriptVk\obj\Debug\ScriptVk.csproj.CoreCompileInputs.cache

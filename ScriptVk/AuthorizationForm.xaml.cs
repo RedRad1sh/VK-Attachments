@@ -42,7 +42,7 @@ namespace ScriptVk
                     string URL = Browser.Source.ToString();
                     string token = (URL.Split('=')[1]).Split('&')[0];
                     accesstoken = token;
-                    MainWindow.Instance.token = accesstoken;
+                    MainWindow.Instance.Token = accesstoken;
                     MainWindow.Instance.DoneAuth.Visibility = Visibility.Visible;
                     MainWindow.Instance.DoneAuth.Foreground = Brushes.DarkGreen;
                     MainWindow.Instance.DoneAuth.Text = "Успешно";

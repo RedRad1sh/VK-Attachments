@@ -132,6 +132,7 @@
     </Compile>
     <Compile Include="VkAttachment.cs" />
     <Compile Include="VkConversation.cs" />
+    <Compile Include="VkDownloading.cs" />
     <Page Include="AuthorizationForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -61,12 +61,17 @@ namespace ScriptVk
                 Mp4_360,
                 Mp4_480,
                 Mp4_720,
-                Mp4_108
+                Mp4_1080
             }
 
             public Uri[] VideoQualityUrls = new Uri[5];
 
-            public void UpdateResolutionLinks()
+            public void SelectResolution(Resolution res)
+            {
+                Url = VideoQualityUrls[(int)res] != null ? VideoQualityUrls[(int)res].AbsoluteUri : Url;
+            }
+
+            private void UpdateResolutionLinks()
             {
                 try {
                     VideoQualityUrls[0] = VideoUrls.Mp4_240;
