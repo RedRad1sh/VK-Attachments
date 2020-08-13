@@ -9,10 +9,8 @@ using VkNet;
 using VkNet.Model;
 using VkNet.Enums.Filters;
 using VkNet.Model.RequestParams;
-using System.Net;
 using VkNet.AudioBypassService.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using System.IO;
 using System.Collections.ObjectModel;
 
 namespace ScriptVk
@@ -28,6 +26,9 @@ namespace ScriptVk
         private VkApi Api;
         public string Token;
         private readonly string ImgNotAvailable = AppDomain.CurrentDomain.BaseDirectory + "\\" + "No_Image_Available.jpg";
+        /// <summary>
+        /// Объект выбранной беседы.
+        /// </summary>
         public VkConversation Conversation;
 
         public MainWindow()
@@ -35,6 +36,13 @@ namespace ScriptVk
             InitializeComponent();
             Instance = this;
             VideoQualityChange.ItemsSource = Enum.GetValues(typeof(VkAttachment.VkVideo.Resolution));
+        }
+
+        private void Autorization_Click(object sender, RoutedEventArgs e)
+        {
+            AuthorizationForm GettingToken = new AuthorizationForm();
+            GettingToken.ShowDialog();
+            Autorization(Token);
         }
 
         public void Autorization(string token)
@@ -78,9 +86,14 @@ namespace ScriptVk
             }, out string str);
         }
 
-        private string M3U8ToMp3(string url)
+        /// <summary>
+        /// Метод перевода m3u8 ссылки в mp3 ссылку.
+        /// </summary>
+        /// <param name="url">Ссылка на m3u8 аудио.</param>
+        /// <returns></returns>
+        public string M3U8ToMp3(string url)
         {
-            // Метод перевода m3u8 ссылки в mp3 ссылку
+
             int ind = url.IndexOf("/index.m3u8");
             url = url.Replace("/index.m3u8", ".mp3");
             int firstindex = url.LastIndexOf('/', ind);
@@ -97,14 +110,6 @@ namespace ScriptVk
                 img.Source = new BitmapImage(new Uri(attachment.PreviewUrl ?? ImgNotAvailable));
             }
         }
-
-        private void Autorization_Click(object sender, RoutedEventArgs e)
-        {
-            AuthorizationForm GettingToken = new AuthorizationForm();
-            GettingToken.ShowDialog();
-            Autorization(Token);
-        }
-
 
         private void ChoiseAttach()
         {
@@ -163,6 +168,24 @@ namespace ScriptVk
             }
         }
 
+        private void VideoQualityChange_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (AttachmentsList.Items[0] is VkAttachment.VkVideo && VideoQualityChange.SelectedIndex != -1)
+                {
+                    foreach (VkAttachment.VkVideo item in AttachmentsList.Items)
+                    {
+                        item.SelectResolution((VkAttachment.VkVideo.Resolution)VideoQualityChange.SelectedItem);
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Произошла непредвиденная ошибка: " + error);
+            }
+        }
+
         #region Методы вывода вложений
 
         private void PhotoShow()
@@ -192,7 +215,7 @@ namespace ScriptVk
                 if ((document = doc.Attachment.Instance as VkNet.Model.Attachments.Document) != null)
                 {
                     var preview = ImgNotAvailable;
-                    try { preview = document.Preview.Photo.Url.AbsoluteUri; } catch { }
+                    try { preview = document.Preview != null ? document.Preview.Photo.Sizes[0].Src.AbsoluteUri: preview; } catch { }
                     var attachment = new VkAttachment.VkDocument(document.Title, document.Uri, "." + document.Ext, preview);
                     AttachmentsList.Items.Add(attachment);
                 }
@@ -246,15 +269,22 @@ namespace ScriptVk
 
             foreach (var audio in getHistoryAttachments)
             {
-                var aud = audio.Attachment.Instance as VkNet.Model.Attachments.Audio;
-                // Если ссылка указывает на файл типа m3u8, переводим её в ссылку mp3
-                string url = aud.Url.AbsoluteUri.Contains(".mp3") ? aud.Url.AbsoluteUri : M3U8ToMp3(aud.Url.AbsoluteUri);
+                try
+                {
+                    var aud = audio.Attachment.Instance as VkNet.Model.Attachments.Audio;
+                    // Если ссылка указывает на файл типа m3u8, переводим её в ссылку mp3
+                    string url = aud.Url.AbsoluteUri.Contains(".mp3") ? aud.Url.AbsoluteUri : M3U8ToMp3(aud.Url.AbsoluteUri);
 
-                var preview = new AudioCover() { Photo300 = ImgNotAvailable };
+                    var preview = new AudioCover() { Photo300 = ImgNotAvailable };
 
-                try { preview = aud.Album.Thumb; } catch { }
-                var attachment = new VkAttachment.VkAudio(aud.Title, url, preview);
-                AttachmentsList.Items.Add(attachment);
+                    try { preview = aud.Album != null ? aud.Album.Thumb : preview; } catch (Exception) { }
+                    var attachment = new VkAttachment.VkAudio(aud.Title, url, preview);
+                    AttachmentsList.Items.Add(attachment);
+                }
+                catch (Exception error)
+                {
+                    MessageBox.Show("Непредвиденная ошибка при загрузке аудио" + error);
+                }
             }
         }
 
@@ -280,23 +310,5 @@ namespace ScriptVk
         }
 
         #endregion
-
-        private void VideoQualityChange_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                if (AttachmentsList.Items[0] is VkAttachment.VkVideo && VideoQualityChange.SelectedIndex != -1)
-                {
-                    foreach (VkAttachment.VkVideo item in AttachmentsList.Items)
-                    {
-                        item.SelectResolution((VkAttachment.VkVideo.Resolution)VideoQualityChange.SelectedItem);
-                    }
-                }
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show("Произошла непредвиденная ошибка: " + error);
-            }
-        }
     }
 }

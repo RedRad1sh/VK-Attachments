@@ -1,18 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VkNet;
 
 namespace ScriptVk
 {
+    /// <summary>
+    /// Беседа.
+    /// </summary>
     public class VkConversation
-    {   
-        public string Title;
-        public long ID;
-        public string type;
+    {
+        /// <summary>
+        /// Название беседы
+        /// </summary>
+        public string Title { get; private set; }
+        /// <summary>
+        /// ID беседы
+        /// </summary>
+        public long ID { get; private set; }
+        /// <summary>
+        /// Тип беседы: "chat", "group", "user"
+        /// </summary>
+        public string type { get; private set; }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса беседы
+        /// </summary>
+        /// <param name="api">Апи пользователя.</param>
+        /// <param name="conversation">Объект беседы.</param>
         public VkConversation(VkApi api, VkNet.Model.ConversationAndLastMessage conversation)
         {
             type = conversation.Conversation.Peer.Type.ToString();
@@ -33,6 +47,30 @@ namespace ScriptVk
                     break;
             }
         }
+
+        /// <summary>
+        /// <para>Принимает объект класса VkApi и количество бесед</para>
+        /// <para>Возвращает список бесед.</para>
+        /// </summary>
+        /// <param name="api">Апи пользователя</param>
+        /// <param name="conversationCount">Количество бесед</param>
+        /// <returns></returns>
+        public static List<VkConversation> LoadConversations(VkApi api, ulong? conversationCount)
+        {
+            List<VkConversation> conversationCollection;
+
+            var conversationsCollection = api.Messages.GetConversations(new VkNet.Model.RequestParams.GetConversationsParams()
+            {
+                Count = conversationCount
+            }).Items;
+            conversationCollection = new List<VkConversation>();
+            foreach (var dialog in conversationsCollection)
+            {
+                conversationCollection.Add(new VkConversation(api, dialog));
+            }
+            return conversationCollection;
+        }
+
         public override string ToString()
         {
             return Title;

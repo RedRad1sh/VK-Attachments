@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using VkNet;
 
 namespace ScriptVk
@@ -20,18 +10,14 @@ namespace ScriptVk
     {
         private VkApi Api;
 
-        private ulong? ConversationCount;
-
-        List<VkConversation> conversationCollection;
-
         public SelectConversationWindow(VkApi api, int conversationCount)
         {
             InitializeComponent();
             Api = api;
-            ConversationCount = (ulong?)conversationCount;
+            ulong? ConversationCount = (ulong?)conversationCount;
             try
             {
-                LoadConversations();
+                ConversationList.ItemsSource = VkConversation.LoadConversations(Api, ConversationCount);
             }
             catch (Exception error)
             {
@@ -39,18 +25,7 @@ namespace ScriptVk
             }
         }
 
-        private void LoadConversations()
-        {
-            var conversationsCollection = Api.Messages.GetConversations(new VkNet.Model.RequestParams.GetConversationsParams() { 
-            Count = ConversationCount
-            }).Items;
-            conversationCollection = new List<VkConversation>();
-            foreach (var dialog in conversationsCollection)
-            {
-                conversationCollection.Add(new VkConversation(Api, dialog));
-            }
-            ConversationList.ItemsSource = conversationCollection;
-        }
+        
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
