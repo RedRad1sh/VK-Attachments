@@ -12,6 +12,9 @@ using VkNet.Model.RequestParams;
 using VkNet.AudioBypassService.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using MahApps.Metro.Controls;
+using System.Threading;
 
 namespace ScriptVk
 {
@@ -30,12 +33,15 @@ namespace ScriptVk
         /// Объект выбранной беседы.
         /// </summary>
         public VkConversation Conversation;
+        private ObservableCollection<ListAttachment> attachmentList;
 
         public MainWindow()
         {
             InitializeComponent();
             Instance = this;
             VideoQualityChange.ItemsSource = Enum.GetValues(typeof(VkAttachment.VkVideo.Resolution));
+            attachmentList = new ObservableCollection<ListAttachment>();
+            AttachmentsList.ItemsSource = attachmentList;
         }
 
         private void Autorization_Click(object sender, RoutedEventArgs e)
@@ -93,7 +99,6 @@ namespace ScriptVk
         /// <returns></returns>
         public string M3U8ToMp3(string url)
         {
-
             int ind = url.IndexOf("/index.m3u8");
             url = url.Replace("/index.m3u8", ".mp3");
             int firstindex = url.LastIndexOf('/', ind);
@@ -110,11 +115,13 @@ namespace ScriptVk
                 img.Source = new BitmapImage(new Uri(attachment.PreviewUrl ?? ImgNotAvailable));
             }
         }
-
+        CancellationTokenSource cts = new CancellationTokenSource();
         private void ChoiseAttach()
         {
             QualityLabel.Visibility = Visibility.Hidden;
             VideoQualityChange.Visibility = Visibility.Hidden;
+            cts.Dispose();
+            cts = new CancellationTokenSource();
             switch (AttachmentType.SelectedIndex)
             {
                 case 0:
@@ -141,6 +148,7 @@ namespace ScriptVk
         {
             try
             {
+                cts.Cancel();
                 ChoiseAttach();
                 FourthStep.IsEnabled = true;
             }
@@ -158,6 +166,10 @@ namespace ScriptVk
             {
                 var window = new SelectConversationWindow(Api, int.Parse(Count.Text));
                 window.ShowDialog();
+                if (Conversation == null)
+                {
+                    throw new Exception();
+                }
                 ConvName.Text = Conversation.Title;
                 ThirdStep.IsEnabled = true;
                 ShowAttachments.IsEnabled = true;
@@ -188,19 +200,40 @@ namespace ScriptVk
 
         #region Методы вывода вложений
 
+        class ListAttachment
+        {
+            public VkAttachment Attachment { get; set; }
+            public string ImgSource { get; set; }
+        }
+
+        private void AddAttachment(VkAttachment attachment)
+        {
+            attachmentList.Add(new ListAttachment
+            {
+                Attachment = attachment,
+                ImgSource = attachment.PreviewUrl
+            }) ;
+        }
+
         private void PhotoShow()
         {
-            AttachmentsList.Items.Clear();
-
-            var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Photo);
-
-            foreach (var photo in getHistoryAttachments)
+            
+            attachmentList.Clear();
+                var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Photo);
+            Dispatcher.BeginInvoke((Action)(async () =>
             {
-                var photos = photo.Attachment.Instance as VkNet.Model.Attachments.Photo;
-                var url = photos.Sizes[photos.Sizes.Count - 1].Url.AbsoluteUri;
-                var attachment = new VkAttachment.VkPhoto(url.Split('/').LastOrDefault(), url);
-                AttachmentsList.Items.Add(attachment);
-            }
+                foreach (var photo in getHistoryAttachments)
+                {
+                    if (cts.IsCancellationRequested)
+                        return;
+                    var photos = photo.Attachment.Instance as VkNet.Model.Attachments.Photo;
+                    var url = photos.Sizes[photos.Sizes.Count - 1].Url.AbsoluteUri;
+                    var attachment = new VkAttachment.VkPhoto(url.Split('/').LastOrDefault(), url);
+                    AddAttachment(attachment);
+                    await Task.Delay(1);
+                }
+            }));
+
         }
 
         private void DocumentShow()
@@ -208,18 +241,21 @@ namespace ScriptVk
             AttachmentsList.Items.Clear();
             var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Doc);
 
-
-            foreach (var doc in getHistoryAttachments)
+            Dispatcher.BeginInvoke((Action)(async () =>
             {
-                VkNet.Model.Attachments.Document document;
-                if ((document = doc.Attachment.Instance as VkNet.Model.Attachments.Document) != null)
+                foreach (var doc in getHistoryAttachments)
                 {
-                    var preview = ImgNotAvailable;
-                    try { preview = document.Preview != null ? document.Preview.Photo.Sizes[0].Src.AbsoluteUri: preview; } catch { }
-                    var attachment = new VkAttachment.VkDocument(document.Title, document.Uri, "." + document.Ext, preview);
-                    AttachmentsList.Items.Add(attachment);
+                    VkNet.Model.Attachments.Document document;
+                    if ((document = doc.Attachment.Instance as VkNet.Model.Attachments.Document) != null)
+                    {
+                        var preview = ImgNotAvailable;
+                        try { preview = document.Preview != null ? document.Preview.Photo.Sizes[0].Src.AbsoluteUri : preview; } catch { }
+                        var attachment = new VkAttachment.VkDocument(document.Title, document.Uri, "." + document.Ext, preview);
+                        AddAttachment(attachment);
+                    }
                 }
-            }
+                await Task.Delay(1);
+            }));
         }
 
         private void LinkShow()
@@ -227,15 +263,18 @@ namespace ScriptVk
             AttachmentsList.Items.Clear();
             var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Link);
 
-
-            foreach (var link in getHistoryAttachments)
+            Dispatcher.BeginInvoke((Action)(async () =>
             {
-                var links = link.Attachment.Instance as VkNet.Model.Attachments.Link;
-                var preview = ImgNotAvailable;
-                try { preview = links.Image; } catch { }
-                var attachment = new VkAttachment.VkLink(links.Title, links.Uri.AbsoluteUri, preview);
-                AttachmentsList.Items.Add(attachment);
-            }
+                foreach (var link in getHistoryAttachments)
+                {
+                    var links = link.Attachment.Instance as VkNet.Model.Attachments.Link;
+                    var preview = ImgNotAvailable;
+                    try { preview = links.Image; } catch { }
+                    var attachment = new VkAttachment.VkLink(links.Title, links.Uri.AbsoluteUri, preview);
+                    AddAttachment(attachment);
+                    await Task.Delay(1);
+                }
+            }));
         }
 
         private void VideoShow()
@@ -254,11 +293,15 @@ namespace ScriptVk
             {
                 Videos = vidlist
             });
-            foreach (var item in videos)
+            Dispatcher.BeginInvoke((Action)(async () =>
             {
-                var attachment = new VkAttachment.VkVideo(item.Title, item.Files, item.Image.LastOrDefault().Url.AbsoluteUri ?? ImgNotAvailable, item.Files.Mp4_240 != null ? item.Files.Mp4_240.AbsoluteUri : ImgNotAvailable);
-                AttachmentsList.Items.Add(attachment);
-            }
+                foreach (var item in videos)
+                {
+                    var attachment = new VkAttachment.VkVideo(item.Title, item.Files, item.Image.LastOrDefault().Url.AbsoluteUri ?? ImgNotAvailable, item.Files.Mp4_240 != null ? item.Files.Mp4_240.AbsoluteUri : ImgNotAvailable);
+                    AddAttachment(attachment);
+                    await Task.Delay(1);
+                }
+            }));
         }
 
         private void AudioShow()
@@ -266,26 +309,30 @@ namespace ScriptVk
             AttachmentsList.Items.Clear();
 
             var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Audio);
-
-            foreach (var audio in getHistoryAttachments)
+            Dispatcher.BeginInvoke((Action)(async () =>
             {
-                try
+                foreach (var audio in getHistoryAttachments)
                 {
-                    var aud = audio.Attachment.Instance as VkNet.Model.Attachments.Audio;
-                    // Если ссылка указывает на файл типа m3u8, переводим её в ссылку mp3
-                    string url = aud.Url.AbsoluteUri.Contains(".mp3") ? aud.Url.AbsoluteUri : M3U8ToMp3(aud.Url.AbsoluteUri);
+                    try
+                    {
+                        var aud = audio.Attachment.Instance as VkNet.Model.Attachments.Audio;
+                        // Если ссылка указывает на файл типа m3u8, переводим её в ссылку mp3
+                        string url = aud.Url.AbsoluteUri.Contains(".mp3") ? aud.Url.AbsoluteUri : M3U8ToMp3(aud.Url.AbsoluteUri);
 
-                    var preview = new AudioCover() { Photo300 = ImgNotAvailable };
+                        var preview = new AudioCover() { Photo300 = ImgNotAvailable };
 
-                    try { preview = aud.Album != null ? aud.Album.Thumb : preview; } catch (Exception) { }
-                    var attachment = new VkAttachment.VkAudio(aud.Title, url, preview);
-                    AttachmentsList.Items.Add(attachment);
+                        try { preview = aud.Album != null ? aud.Album.Thumb : preview; } catch (Exception) { }
+                        var attachment = new VkAttachment.VkAudio(aud.Title, url, preview);
+                        AddAttachment(attachment);
+                        await Task.Delay(1);
+                    }
+                    catch (Exception error)
+                    {
+                        cts.Cancel();
+                        MessageBox.Show("Непредвиденная ошибка при загрузке аудио" + error);
+                    }
                 }
-                catch (Exception error)
-                {
-                    MessageBox.Show("Непредвиденная ошибка при загрузке аудио" + error);
-                }
-            }
+            }));
         }
 
         #endregion

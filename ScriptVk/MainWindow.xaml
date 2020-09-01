@@ -10,7 +10,19 @@
     <Grid>
         <Border x:Name="FourthStep" BorderBrush="#FF877878" BorderThickness="2" HorizontalAlignment="Left" Height="571" Margin="23,18,0,0" VerticalAlignment="Top" Width="250" IsEnabled="False">
             <Grid>
-                <ListBox x:Name="AttachmentsList" HorizontalAlignment="Left" Height="480" Margin="10,77,0,0" VerticalAlignment="Top" Width="226" SelectionChanged="AttachmentsList_SelectionChanged" SelectionMode="Extended" Background="#C8EFE2FF" Foreground="#FF221578"/>
+                <ListBox x:Name="AttachmentsList" HorizontalAlignment="Left" Height="480" Margin="10,77,0,0" VerticalAlignment="Top" Width="226" SelectionChanged="AttachmentsList_SelectionChanged" SelectionMode="Extended" Background="#C8EFE2FF" Foreground="#FF221578">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Attachment}">
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <Image Width="100" Source="{Binding Path=ImgSource}"/>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 <Button x:Name="DownloadAll" Content="Скачать все" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Click="DownloadAll_Click" Height="31" Margin="14,41,0,0" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="10" Padding="0"/>
                 <Button x:Name="DownloadCurrent" Content="Скачать выбранные" HorizontalAlignment="Left" Margin="99,41,0,0" VerticalAlignment="Top" Width="137" Height="31" Click="DownloadCurrent_Click" Foreground="#FF221578" Background="#C8EFE2FF" BorderBrush="#00707070" FontSize="10" Padding="0"/>
                 <TextBlock HorizontalAlignment="Left" Margin="6,0,0,535" TextWrapping="Wrap" Text="#4" VerticalAlignment="Bottom" FontFamily="Segoe Script" FontSize="18" RenderTransformOrigin="0.559,1.145" Foreground="#FF221578">

@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using VkNet;
 
 namespace ScriptVk
@@ -55,20 +59,20 @@ namespace ScriptVk
         /// <param name="api">Апи пользователя</param>
         /// <param name="conversationCount">Количество бесед</param>
         /// <returns></returns>
-        public static List<VkConversation> LoadConversations(VkApi api, ulong? conversationCount)
+        public async static void LoadConversations(VkApi api, ulong? conversationCount, ObservableCollection<VkConversation> vkConversations, CancellationTokenSource cts)
         {
-            List<VkConversation> conversationCollection;
 
             var conversationsCollection = api.Messages.GetConversations(new VkNet.Model.RequestParams.GetConversationsParams()
             {
                 Count = conversationCount
             }).Items;
-            conversationCollection = new List<VkConversation>();
-            foreach (var dialog in conversationsCollection)
+            foreach (var conv in conversationsCollection)
             {
-                conversationCollection.Add(new VkConversation(api, dialog));
+                if (cts.IsCancellationRequested)
+                    return;
+                vkConversations.Add(new VkConversation(api, conv));
+                await Task.Delay(15);
             }
-            return conversationCollection;
         }
 
         public override string ToString()

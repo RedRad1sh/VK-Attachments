@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScriptVk"
         mc:Ignorable="d"
-        Title="SelectConversationWindow" Height="450" Width="307.143">
+        Title="SelectConversationWindow" Height="450" Width="307.143" ResizeMode="NoResize" Icon="conversations.ico" Closed="Window_Closed">
     <Grid>
         <ListBox x:Name="ConversationList" HorizontalAlignment="Left" Height="345" Margin="10,10,0,0" VerticalAlignment="Top" Width="279" SelectionChanged="ConversationList_SelectionChanged"/>
         <Button x:Name="Select" Content="Выбрать" HorizontalAlignment="Left" Margin="82,381,0,0" VerticalAlignment="Top" Width="141" Height="28" Click="Button_Click" IsEnabled="False"/>
