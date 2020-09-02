@@ -33,14 +33,14 @@ namespace ScriptVk
         /// Объект выбранной беседы.
         /// </summary>
         public VkConversation Conversation;
-        private ObservableCollection<ListAttachment> attachmentList;
+        private ObservableCollection<VkAttachment> attachmentList;
 
         public MainWindow()
         {
             InitializeComponent();
             Instance = this;
             VideoQualityChange.ItemsSource = Enum.GetValues(typeof(VkAttachment.VkVideo.Resolution));
-            attachmentList = new ObservableCollection<ListAttachment>();
+            attachmentList = new ObservableCollection<VkAttachment>();
             AttachmentsList.ItemsSource = attachmentList;
         }
 
@@ -208,18 +208,14 @@ namespace ScriptVk
 
         private void AddAttachment(VkAttachment attachment)
         {
-            attachmentList.Add(new ListAttachment
-            {
-                Attachment = attachment,
-                ImgSource = attachment.PreviewUrl
-            }) ;
+            attachmentList.Add(attachment);
         }
 
         private void PhotoShow()
         {
-            
+
             attachmentList.Clear();
-                var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Photo);
+            var getHistoryAttachments = GettingHistoryAttachments(VkNet.Enums.SafetyEnums.MediaType.Photo);
             Dispatcher.BeginInvoke((Action)(async () =>
             {
                 foreach (var photo in getHistoryAttachments)
@@ -339,21 +335,37 @@ namespace ScriptVk
 
         #region Методы скачивания вложений
 
-        private void DownloadAll_Click(object sender, RoutedEventArgs e)
+        private async void DownloadAll_Click(object sender, RoutedEventArgs e)
         {
-            if (!(AttachmentsList.Items[0] is VkAttachment.VkLink))
-                VkDownloading.DownloadAttachments(AttachmentsList.Items, Conversation.Title);
-            else
-                VkDownloading.DownloadLinks(AttachmentsList.Items, Conversation.Title);
+            var list = new List<VkAttachment>();
+            foreach (VkAttachment item in AttachmentsList.Items)
+            {
+                list.Add(item);
+            }
+            await Task.Run(() =>
+            {
+                if (!(AttachmentsList.Items[0] is VkAttachment.VkLink))
+                    VkDownloading.DownloadAttachments(list, Conversation.Title);
+                else
+                    VkDownloading.DownloadLinks(list, Conversation.Title);
+            });
+
         }
 
-
-        private void DownloadCurrent_Click(object sender, RoutedEventArgs e)
+        private async void DownloadCurrent_Click(object sender, RoutedEventArgs e)
+        {
+            var list = new List<VkAttachment>();
+            foreach (VkAttachment item in AttachmentsList.SelectedItems)
+            {
+                list.Add(item);
+            }
+            await Task.Run(() =>
         {
             if (!(AttachmentsList.Items[0] is VkAttachment.VkLink))
-                VkDownloading.DownloadAttachments(AttachmentsList.SelectedItems, Conversation.Title);
+                VkDownloading.DownloadAttachments(list, Conversation.Title);
             else
-                VkDownloading.DownloadLinks(AttachmentsList.SelectedItems, Conversation.Title);
+                VkDownloading.DownloadLinks(list, Conversation.Title);
+        });
         }
 
         #endregion

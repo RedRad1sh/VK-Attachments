@@ -13,10 +13,10 @@
                 <ListBox x:Name="AttachmentsList" HorizontalAlignment="Left" Height="480" Margin="10,77,0,0" VerticalAlignment="Top" Width="226" SelectionChanged="AttachmentsList_SelectionChanged" SelectionMode="Extended" Background="#C8EFE2FF" Foreground="#FF221578">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Path=Attachment}">
+                            <TextBlock Text="{Binding Path=Title}">
                                 <TextBlock.ToolTip>
                                     <ToolTip>
-                                        <Image Width="100" Source="{Binding Path=ImgSource}"/>
+                                        <Image Width="100" Source="{Binding Path=PreviewUrl}"/>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
                             </TextBlock>
